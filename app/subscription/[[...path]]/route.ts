@@ -330,6 +330,10 @@ async function proxyToListmonk(request: NextRequest) {
     modified = modified.replace(/<a[^>]*href=["'][^"']*listmonk\.app[^"']*["'][^>]*>[\s\S]*?<\/a>/gi, "");
     modified = modified.replace(/<img[^>]*(?:src|alt)=["'][^"']*listmonk[^"']*["'][^>]*\/?>/gi, "");
     modified = modified.replace(/<[^>]*>\s*listmonk\s*<\/[^>]*>/gi, "");
+    // Remove logo link with image (listmonk logo in <a> containing <img>)
+    modified = modified.replace(/<a[^>]*href=["'][^"']*listmonk[^"']*["'][^>]*>[\s\S]*?<img[^>]*>[\s\S]*?<\/a>/gi, "");
+    // Remove logo container div (e.g. <div class="logo"> with link+image)
+    modified = modified.replace(/<div[^>]*class=["']logo["'][^>]*>[\s\S]*?<\/div>/gi, "");
     // Clean up empty elements that may remain
     modified = modified.replace(/<p[^>]*>\s*<\/p>/gi, "");
     modified = modified.replace(/<div[^>]*>\s*<\/div>/gi, "");
