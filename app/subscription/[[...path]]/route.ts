@@ -321,9 +321,18 @@ async function proxyToListmonk(request: NextRequest) {
     const html = await upstream.text();
     let modified = html;
 
-    // Strip "Powered by listmonk"
-    modified = modified.replace(/Powered by listmonk/gi, "");
+    // Strip listmonk branding — remove text, links, images and containers
+    modified = modified.replace(/Powered by\s*listmonk/gi, "");
+    modified = modified.replace(/<p[^>]*>[\s\S]*?Powered by[\s\S]*?<\/p>/gi, "");
+    modified = modified.replace(/<div[^>]*>[\s\S]*?Powered by[\s\S]*?<\/div>/gi, "");
+    modified = modified.replace(/<span[^>]*>[\s\S]*?Powered by[\s\S]*?<\/span>/gi, "");
+    modified = modified.replace(/<footer[^>]*>[\s\S]*?Powered by[\s\S]*?<\/footer>/gi, "");
+    modified = modified.replace(/<a[^>]*href=["'][^"']*listmonk\.app[^"']*["'][^>]*>[\s\S]*?<\/a>/gi, "");
+    modified = modified.replace(/<img[^>]*(?:src|alt)=["'][^"']*listmonk[^"']*["'][^>]*\/?>/gi, "");
     modified = modified.replace(/<[^>]*>\s*listmonk\s*<\/[^>]*>/gi, "");
+    // Clean up empty elements that may remain
+    modified = modified.replace(/<p[^>]*>\s*<\/p>/gi, "");
+    modified = modified.replace(/<div[^>]*>\s*<\/div>/gi, "");
 
     if (modified.includes("</head>")) {
       modified = modified.replace("</head>", `${RGL_CSS}</head>`);
